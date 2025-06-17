@@ -1,5 +1,6 @@
 const Bug = require('../models/Bug');
 const Project = require('../models/Project');
+const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 
 // @desc    Get all bugs
