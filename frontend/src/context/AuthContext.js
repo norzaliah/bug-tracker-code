@@ -1,7 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import api from '../services/api';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { login as apiLogin, getCurrentUser } from '../services/authService';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null); // Initialize with null
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -10,10 +10,10 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const { data } = await api.get('/auth/me');
-        setUser(data);
+        const user = await getCurrentUser();
+        setUser(user);
       } catch (err) {
-        localStorage.removeItem('token');
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -22,9 +22,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
+    const user = await apiLogin(email, password);
+    setUser(user);
+    return user;
   };
 
   const logout = () => {
@@ -32,11 +32,20 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const value = { user, loading, login, logout };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+    <AuthContext.Provider value={value}>
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+// Add null check in useAuth
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

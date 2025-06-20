@@ -1,12 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
+  const { user, logout } = useAuth(); // Now safely destructured
+  
   return (
-    <nav style={{ padding: '1rem', background: '#f0f0f0' }}>
-      <Link to="/" style={{ marginRight: '1rem' }}>Home</Link>
-      <Link to="/bugs" style={{ marginRight: '1rem' }}>Bugs</Link>
-      <Link to="/projects">Projects</Link>
+    <nav>
+      {/* ... navbar content ... */}
+      {user ? (
+        <button onClick={logout}>Logout</button>
+      ) : (
+        <a href="/login">Login</a>
+      )}
     </nav>
   );
 }
