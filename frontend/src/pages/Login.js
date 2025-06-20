@@ -12,13 +12,23 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
-      navigate('/bugs');
-    } catch (err) {
-      setError('Failed to login. Please check your credentials.');
-      console.error('Login error:', err);
+    await login(email, password);
+    navigate('/bugs');
+  } catch (err) {
+    let errorMessage = 'Failed to login. Please check your credentials.';
+    
+    if (err.code === 'auth/user-not-found') {
+      errorMessage = 'No user found with this email.';
+    } else if (err.code === 'auth/wrong-password') {
+      errorMessage = 'Incorrect password.';
+    } else if (err.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email format.';
     }
-  };
+    
+    setError(errorMessage);
+    console.error('Login error:', err.code, err.message);
+  }
+};
 
   return (
     <div className="login-container">
