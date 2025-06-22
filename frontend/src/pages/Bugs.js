@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
-import { format } from 'date-fns'; // For date formatting
-import './Bugs.css'; // You'll need to create this CSS file
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import './Bugs.css';
 
 export default function Bugs() {
   const [bugs, setBugs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBugs = async () => {
@@ -43,28 +45,41 @@ export default function Bugs() {
     }
   };
 
+  const handleClickBug = (bugId) => {
+    navigate(`/bugs/${bugId}`); // Assuming you have a detail page
+  };
+
   if (loading) return <div className="loading">Loading bugs...</div>;
   if (error) return <div className="error">{error}</div>;
   if (bugs.length === 0) return <div className="no-bugs">No bugs found</div>;
 
   return (
     <div className="bugs-container">
-      <h2 className="bugs-header">Bug Tracker</h2>
-      
+      <div className="bugs-header-row">
+        <h2 className="bugs-header">Bug List</h2>
+        <button className="add-bug-btn" onClick={() => navigate('/bugs/new')}>
+          + Report Bug
+        </button>
+      </div>
+
       <div className="bugs-grid">
         <div className="grid-header">
-          <div>Bug Name</div>
+          <div>Bug</div>
           <div>Owner</div>
           <div>Due Date</div>
           <div>Priority</div>
           <div>Status</div>
         </div>
-        
+
         {bugs.map(bug => (
-          <div key={bug._id} className="bug-item">
+          <div
+            key={bug._id}
+            className="bug-item"
+            onClick={() => handleClickBug(bug._id)}
+          >
             <div className="bug-name">
               <strong>{bug.title}</strong>
-              <div className="bug-description">{bug.description}</div>
+              <p className="bug-description">{bug.description}</p>
             </div>
             <div>{bug.owner?.name || 'Unassigned'}</div>
             <div>{bug.dueDate ? format(new Date(bug.dueDate), 'MMM dd, yyyy') : 'No due date'}</div>
