@@ -1,21 +1,33 @@
 const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
 exports.register = async (req, res, next) => {
   try {
-    const { email, name } = req.body;
+    const { email, name, password, role } = req.body;
 
     // Create user
     const user = await User.create({
       email,
-      name
+      name,
+      password, // Password will be hashed automatically via pre-save hook
+      role
     });
+
+    // Generate token
+    const token = user.getSignedJwtToken();
 
     res.status(201).json({
       success: true,
-      data: user
+      token,
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (err) {
     next(err);
@@ -27,9 +39,18 @@ exports.register = async (req, res, next) => {
 // @access  Public
 exports.login = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    // Validate email/password
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide an email and password'
+      });
+    }
+
+    // Check for user (include password field)
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(401).json({
@@ -38,9 +59,28 @@ exports.login = async (req, res, next) => {
       });
     }
 
+    // Check if password matches
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+
+    // Generate token
+    const token = user.getSignedJwtToken();
+
     res.status(200).json({
       success: true,
-      data: user
+      token,
+      data: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar
+      }
     });
   } catch (err) {
     next(err);
