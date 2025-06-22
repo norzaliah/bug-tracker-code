@@ -46,8 +46,9 @@ const SignupForm = () => {
 
       navigate('/bugs'); // Redirect after successful signup
     } catch (err) {
-      setError('Signup failed. ' + err.message);
-      console.error(err.message);
+      setError(`Google signup failed: ${err.code}`);
+      console.error('Google signup error code:', err.code);
+      console.error('Google signup error message:', err.message);
     }
   };
 
