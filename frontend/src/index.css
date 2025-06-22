@@ -1,29 +1,45 @@
-
-body {
+/* Reset and global layout */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: linear-gradient(135deg, #9C27B0, #FFEB3B);
+  overflow: hidden; /* Prevent small scrollbars from white lines */
 }
 
+/* App wrapper (if used) */
 .App {
   text-align: center;
   padding: 2rem;
 }
 
+/* Headings */
 h1 {
   color: #333;
 }
+
+/* Login container styling */
 .login-container {
-  max-width: 400px;
+  max-width: 550px;
   margin: 2rem auto;
   padding: 2rem;
   border: 1px solid #ddd;
   border-radius: 8px;
+  background: white;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 }
 
+/* Form group spacing */
 .form-group {
   margin-bottom: 1rem;
 }
@@ -40,19 +56,30 @@ h1 {
   border-radius: 4px;
 }
 
+/* Error message */
 .error-message {
   color: red;
   margin-bottom: 1rem;
 }
 
+/* Navbar styling */
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1rem 2rem;
   background: #f0f0f0;
+  align-items: center;
 }
 
 .nav-links {
   display: flex;
   gap: 1rem;
+}
+
+/* Optional: prevent white line from animation overflow */
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

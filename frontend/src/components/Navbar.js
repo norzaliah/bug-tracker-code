@@ -1,16 +1,14 @@
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const { user, logout } = useAuth(); // Now safely destructured
+  const { user, logout } = useAuth();
   
   return (
     <nav>
-      {/* ... navbar content ... */}
-      {user ? (
-        <button onClick={logout}>Logout</button>
-      ) : (
-        <a href="/login">Login</a>
-      )}
+      {/* Your other navbar links here */}
+
+      {/* Only show Logout when user is logged in */}
+      {user && <button onClick={logout}>Logout</button>}
     </nav>
   );
 }
