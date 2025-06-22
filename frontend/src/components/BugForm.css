@@ -1,0 +1,32 @@
+.bug-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.bug-form label {
+  display: block;
+  margin-top: 1rem;
+}
+
+.bug-form input,
+.bug-form textarea,
+.bug-form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+.bug-form button {
+  margin-top: 1.5rem;
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.bug-form button:hover {
+  background-color: #0056b3;
+}
