@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Auth.css';
+import '../styles/Auth.css';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
 import { AnimatePresence, motion } from 'framer-motion';
