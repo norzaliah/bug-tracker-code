@@ -1,8 +1,8 @@
 // frontend/components/Layout.js
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import './Navbar.js'; // now refers to the old Sidebar
-import './Layout.css'; // styling
+import Sidebar from './Navbar'; // your existing Sidebar
+import '../styles/Layout.css';
 
 export default function Layout() {
   return (
