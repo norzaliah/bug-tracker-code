@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../services/api';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import './Bugs.css';
+import '../styles/Bugs.css';
 
 export default function Bugs() {
   const [bugs, setBugs] = useState([]);
