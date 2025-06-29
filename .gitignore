@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Ignore ALL node_modules folders everywhere in the project
+node_modules/
