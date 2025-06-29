@@ -8,6 +8,7 @@ import Projects from './pages/Projects';
 import Dashboard from './pages/Dashboard';
 import CalendarPage from './pages/Calendar';
 import Discuss from './pages/Discuss';
+import Settings from './pages/Settings';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="projects" element={<Projects />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="discuss" element={<Discuss />} />
+          <Route path="settings" element={<Settings />} />
 
           {/* Optional: match the "Manage" link in Dashboard's team section */}
           <Route path="team" element={<div><h1>Team Management Page</h1></div>} />
