@@ -1,85 +1,84 @@
 // frontend/pages/Discuss.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../context/AuthContext';
 import '../styles/Discuss.css';
 
 export default function Discuss() {
-  const [message, setMessage] = useState('');
-  const [discussion, setDiscussion] = useState([]);
+  const { user } = useAuth();
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem('discussionMessages');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [newMessage, setNewMessage] = useState('');
+  const bottomRef = useRef(null);
 
-  // Load from localStorage
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('discussion')) || [];
-    setDiscussion(stored);
-  }, []);
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  // Save to localStorage when updated
   useEffect(() => {
-    localStorage.setItem('discussion', JSON.stringify(discussion));
-  }, [discussion]);
+    localStorage.setItem('discussionMessages', JSON.stringify(messages));
+  }, [messages]);
 
-  // Add new message
   const handleSend = () => {
-    if (!message.trim()) return;
-
-    const newMessage = {
+    if (!newMessage.trim()) return;
+    const newMsg = {
       id: Date.now(),
-      user: 'You', // You can change to currentUser.name if using AuthContext
-      text: message.trim(),
-      timestamp: new Date().toLocaleString()
+      userId: user.id,
+      userName: user.name,
+      text: newMessage,
+      timestamp: new Date().toISOString(),
     };
-
-    setDiscussion([...discussion, newMessage]);
-    setMessage('');
+    setMessages([...messages, newMsg]);
+    setNewMessage('');
   };
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-content-wrapper">
         <div className="main-content">
-          {/* 🔝 Top section */}
+          {/* 🔝 Top bar */}
           <div className="top-section">
             <div className="top-card calendar-header-bar">
               <div className="calendar-actions">
-                <input
-                  type="text"
-                  placeholder="Search discussion..."
-                  className="calendar-search-input"
-                />
+                <input type="text" placeholder="Search discussion..." className="calendar-search" />
                 <button className="create-event-btn">+ Add Bug</button>
               </div>
             </div>
           </div>
 
-          {/* 🧾 Discuss card */}
-          <div className="card discuss-card">
+          {/* 💬 Discussion card */}
+          <div className="card calendar-card">
             <div className="calendar-header">
-              <h3>Team Discussion</h3>
+              <h3>Team Discussions</h3>
               <hr />
             </div>
 
-            <div className="discuss-body">
-              <div className="messages">
-                {discussion.length === 0 ? (
-                  <p className="no-messages">No messages yet.</p>
-                ) : (
-                  discussion.map((msg) => (
-                    <div className="message-card" key={msg.id}>
-                      <div className="message-header">
-                        <strong>{msg.user}</strong>
-                        <span className="timestamp">{msg.timestamp}</span>
-                      </div>
-                      <p>{msg.text}</p>
+            <div className="discussion-body">
+              <div className="messages-list">
+                {messages.length === 0 && <p className="no-messages">No messages yet.</p>}
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`message ${msg.userId === user.id ? 'own' : 'other'}`}
+                  >
+                    <div className="message-header">
+                      <strong>{msg.userName}</strong>
+                      <small>{new Date(msg.timestamp).toLocaleString()}</small>
                     </div>
-                  ))
-                )}
+                    <div className="message-text">{msg.text}</div>
+                  </div>
+                ))}
+                <div ref={bottomRef} />
               </div>
 
-              <div className="message-input-area">
+              {/* ✍️ Input box */}
+              <div className="message-input">
                 <input
                   type="text"
-                  placeholder="Write a message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 />
                 <button onClick={handleSend}>Send</button>
