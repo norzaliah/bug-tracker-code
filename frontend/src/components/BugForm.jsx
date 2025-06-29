@@ -8,20 +8,22 @@ import '../styles/BugForm.css';
 export default function BugForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth(); // Assuming user has role info
+  const { user } = useAuth();
+
+  const isEdit = Boolean(id);
+  const isEditable = user && ['developer', 'tester'].includes(user.role);
+
   const [bug, setBug] = useState({
     title: '',
     description: '',
     priority: 'medium',
     status: 'open',
     dueDate: '',
-    owner: '',
+    owner: user?._id || '',
   });
+
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
-  const isEdit = Boolean(id);
-
-  const isEditable = user && ['developer', 'tester'].includes(user.role);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -57,19 +59,20 @@ export default function BugForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBug({ ...bug, [name]: value });
+    setBug((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isEditable) return;
 
     try {
       if (isEdit) {
+        if (!isEditable) return;
         await api.put(`/bugs/${id}`, bug);
       } else {
         await api.post('/bugs', bug);
       }
+
       navigate('/bugs');
     } catch (err) {
       console.error('Submission error:', err);
@@ -79,7 +82,6 @@ export default function BugForm() {
 
   const handleDelete = async () => {
     if (!isEditable) return;
-
     if (window.confirm('Are you sure you want to delete this bug?')) {
       try {
         await api.delete(`/bugs/${id}`);
@@ -89,6 +91,10 @@ export default function BugForm() {
         setError('Failed to delete bug.');
       }
     }
+  };
+
+  const handleCancel = () => {
+    navigate('/bugs');
   };
 
   return (
@@ -103,7 +109,7 @@ export default function BugForm() {
           value={bug.title}
           onChange={handleChange}
           required
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         />
 
         <label>Description</label>
@@ -111,7 +117,7 @@ export default function BugForm() {
           name="description"
           value={bug.description}
           onChange={handleChange}
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         />
 
         <label>Priority</label>
@@ -119,7 +125,7 @@ export default function BugForm() {
           name="priority"
           value={bug.priority}
           onChange={handleChange}
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         >
           <option value="critical">Critical</option>
           <option value="high">High</option>
@@ -132,7 +138,7 @@ export default function BugForm() {
           name="status"
           value={bug.status}
           onChange={handleChange}
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         >
           <option value="open">Open</option>
           <option value="in-progress">In Progress</option>
@@ -146,7 +152,7 @@ export default function BugForm() {
           name="dueDate"
           value={bug.dueDate}
           onChange={handleChange}
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         />
 
         <label>Assign to</label>
@@ -154,7 +160,7 @@ export default function BugForm() {
           name="owner"
           value={bug.owner}
           onChange={handleChange}
-          disabled={!isEditable}
+          disabled={isEdit && !isEditable}
         >
           <option value="">Unassigned</option>
           {users.map((u) => (
@@ -164,26 +170,27 @@ export default function BugForm() {
           ))}
         </select>
 
-        {isEditable && (
-          <div>
-            <button type="submit">
+        <div className="form-buttons">
+          {(isEdit && isEditable) || !isEdit ? (
+            <button type="submit" className="submit-btn">
               {isEdit ? 'Update Bug' : 'Create Bug'}
             </button>
+          ) : null}
 
-            {isEdit && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                style={{
-                  backgroundColor: '#dc3545',
-                  marginLeft: '1rem',
-                }}
-              >
-                Delete Bug
-              </button>
-            )}
-          </div>
-        )}
+          {isEdit && isEditable && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="delete-btn"
+            >
+              Delete Bug
+            </button>
+          )}
+
+          <button type="button" onClick={handleCancel} className="cancel-btn">
+            Cancel
+          </button>
+        </div>
       </form>
     </div>
   );
